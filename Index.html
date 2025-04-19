@@ -1,68 +1,84 @@
-<h1 weed wiki h1>
-function navigate(page) {
-    document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
-    document.getElementById(page).style.display = 'block';
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weed Wiki</title>
 
-function saveStrain() {
-    const name = document.getElementById("strainName").value.trim();
-    const type = document.getElementById("strainType").value;
-    const checkboxes = document.querySelectorAll("#entry input[type=checkbox]:checked");
-    const terpenes = Array.from(checkboxes).map(cb => cb.value);
-    const percent = document.getElementById("terpPercent").value;
-    const description = document.getElementById("description").value.trim();
+  <!-- PWA & Theme -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.png" />
+  <meta name="theme-color" content="#c8f7c5" />
 
-    if (!name || !type || terpenes.length === 0 || !percent) {
-        alert("Please fill all required fields.");
-        return;
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log("Service Worker Registered"))
+        .catch(err => console.error("Service Worker Registration Failed", err));
     }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Weed Wiki</h1>
 
-    const strain = { name, type, terpenes, percent, description };
-    let strains = JSON.parse(localStorage.getItem("strains")) || [];
-    strains.push(strain);
-    localStorage.setItem("strains", JSON.stringify(strains));
-    alert("Strain saved!");
-    document.getElementById("strainName").value = "";
-    document.getElementById("strainType").value = "";
-    checkboxes.forEach(cb => cb.checked = false);
-    document.getElementById("terpPercent").value = "";
-    document.getElementById("description").value = "";
-}
+    <!-- Main Menu -->
+    <div id="menu" class="section">
+      <button onclick="navigate('entry')">Entry</button>
+      <button onclick="navigate('lookup')">Lookup</button>
+    </div>
 
-function searchStrains() {
-    const name = document.getElementById("searchName").value.toLowerCase();
-    const type = document.getElementById("searchType").value;
-    const terp = document.getElementById("searchTerp").value.toLowerCase();
-    const percent = document.getElementById("searchPercent").value;
-    const desc = document.getElementById("searchDesc").value.toLowerCase();
+    <!-- Entry Page -->
+    <div id="entry" class="section" style="display:none;">
+      <h2>Add New Strain</h2>
+      <input id="strainName" placeholder="Strain Name" />
+      <select id="strainType">
+        <option value="">Type</option>
+        <option value="Sativa">Sativa</option>
+        <option value="Indica">Indica</option>
+        <option value="Hybrid">Hybrid</option>
+      </select>
+      <label>Select up to 5 Terpenes:</label>
+      <div class="checkboxes">
+        <label><input type="checkbox" value="Myrcene"> Myrcene</label>
+        <label><input type="checkbox" value="Limonene"> Limonene</label>
+        <label><input type="checkbox" value="Caryophyllene"> Caryophyllene</label>
+        <label><input type="checkbox" value="Linalool"> Linalool</label>
+        <label><input type="checkbox" value="A-Pinene"> A-Pinene</label>
+      </div>
+      <input id="terpPercent" type="number" placeholder="Terpene %" />
+      <textarea id="description" placeholder="Description (optional)"></textarea>
+      <button onclick="saveStrain()">Save</button>
+      <button onclick="navigate('menu')">Back</button>
+    </div>
 
-    const strains = JSON.parse(localStorage.getItem("strains")) || [];
-    const results = strains.filter(strain => {
-        return (!name || strain.name.toLowerCase().includes(name)) &&
-               (!type || strain.type === type) &&
-               (!terp || strain.terpenes.some(t => t.toLowerCase().includes(terp))) &&
-               (!percent || parseFloat(strain.percent) === parseFloat(percent)) &&
-               (!desc || strain.description.toLowerCase().includes(desc));
-    });
+    <!-- Lookup Page -->
+    <div id="lookup" class="section" style="display:none;">
+      <h2>Lookup Strains</h2>
+      <input id="searchName" placeholder="Strain Name" />
+      <select id="searchType">
+        <option value="">Type</option>
+        <option value="Sativa">Sativa</option>
+        <option value="Indica">Indica</option>
+        <option value="Hybrid">Hybrid</option>
+      </select>
+      <input id="searchTerp" placeholder="Terpene (any one)" />
+      <input id="searchPercent" type="number" placeholder="Terpene %" />
+      <input id="searchDesc" placeholder="Description keyword" />
+      <button onclick="searchStrains()">Search</button>
+      <ul id="results"></ul>
+      <button onclick="navigate('menu')">Back</button>
+    </div>
 
-    const resultsList = document.getElementById("results");
-    resultsList.innerHTML = "";
-    results.forEach((s, i) => {
-        const li = document.createElement("li");
-        li.textContent = `${s.name} (${s.type})`;
-        li.ondblclick = () => showDetail(s);
-        resultsList.appendChild(li);
-    });
-}
+    <!-- Detail Page -->
+    <div id="detail" class="section" style="display:none;">
+      <h2>Strain Details</h2>
+      <div id="detailContent"></div>
+      <button onclick="navigate('lookup')">Back to Lookup</button>
+    </div>
+  </div>
 
-function showDetail(strain) {
-    navigate('detail');
-    const detailDiv = document.getElementById("detailContent");
-    detailDiv.innerHTML = `
-        <p><strong>Name:</strong> ${strain.name}</p>
-        <p><strong>Type:</strong> ${strain.type}</p>
-        <p><strong>Terpenes:</strong> ${strain.terpenes.join(', ')}</p>
-        <p><strong>Terpene %:</strong> ${strain.percent}</p>
-        <p><strong>Description:</strong> ${strain.description}</p>
-    `;
-}
+  <script src="script.js"></script>
+</body>
+</html>

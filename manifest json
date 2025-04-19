@@ -1,0 +1,20 @@
+{
+  "name": "Weed Wiki",
+  "short_name": "WeedWiki",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#e6f9e6",
+  "theme_color": "#c8f7c5",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
